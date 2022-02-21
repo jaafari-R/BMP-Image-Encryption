@@ -6,7 +6,9 @@
               d/decrypt for decryption.
         
         arg2: the path of the bmp image that we
-               want to encrypt.
+               want to encrypt/decrypt.
+
+        arg3: the output image path.
 */
 
 #include <iostream>
@@ -18,23 +20,23 @@
     0 for invalid inputs */
 char readArg1(char* arg);
 
-int main(char argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    char option;
+    char option; // 'e' = encrypt / 'd' = decrypt / 0 = invalid option
 
     // -+-+-+-+- Input reading -+-+-+-+-
     if(argc < 3)
     {
         printf("Two arguements are required,\n\t"
         "arg1: e/encrypt or d/decrypt"
-        "arg2: the path to the bmp image.");
+        "arg2: the path to the bmp image.\n");
         return 1;
     }
 
     option = readArg1(argv[1]);
     if(!option)
     {
-        printf("The first argument may only be e/encrypt (for encryption) or d/decrypt (for decryption)");
+        printf("The first argument may only be e/encrypt (for encryption) or d/decrypt (for decryption)\n");
         return 1;
     }
 
