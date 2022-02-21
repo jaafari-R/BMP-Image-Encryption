@@ -110,6 +110,8 @@ uint BMPImage::getImgDataSize() {return img_pixels_size;}
 
 void BMPImage::setImgData(char* img)
 {
+    if(!img)
+        return;
     std::memcpy(image_pixels, img, img_pixels_size);
     delete img;
 }

@@ -27,7 +27,10 @@ public:
 
     char* getImgData(); // return image_pixels
     uint getImgDataSize(); // returns img_pixels_size
-    void setImgData(char* img); // sets image_pixels
+    /* sets image_pixels, this function does nothing if img is a nullptr,
+        and frees img memory, if img is not an allocated memory on the heap an error will occure
+    */
+    void setImgData(char* img);
 private:
     char* readImageFile(const std::string& image_path);
     
