@@ -14,6 +14,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "bmp_crypto.h"
+
 /* Reads the first argument and returns:
     'e' fo encryption
     'd' for decryption
@@ -23,9 +25,11 @@ char readArg1(char* arg);
 int main(int argc, char* argv[])
 {
     char option; // 'e' = encrypt / 'd' = decrypt / 0 = invalid option
+    std::string in_img_path; // the path of the input img
+    std::string out_img_path; // the path of the output img
 
     // -+-+-+-+- Input reading -+-+-+-+-
-    if(argc < 3)
+    if(argc < 4)
     {
         printf("Two arguements are required,\n\t"
         "arg1: e/encrypt or d/decrypt"
@@ -39,8 +43,6 @@ int main(int argc, char* argv[])
         printf("The first argument may only be e/encrypt (for encryption) or d/decrypt (for decryption)\n");
         return 1;
     }
-
-
 
 }
 

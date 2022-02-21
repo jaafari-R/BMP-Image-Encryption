@@ -6,24 +6,35 @@
 class BMPImage
 {
 public:
+    /* Sets
+         img_size and img_pixels_size to 0
+         image and image_pixels to nullptr
+    */
     BMPImage();
     /* Reads the bmp image with the path image_path
-       If the path is invalid or the file is not a BMP file:
-            prefix and image are set to ""
+       If an error occures while openning the file or it is not a BMP file
+        the member variables are set to the default values
     */
     BMPImage(const std::string& image_path);
+    // frees image
+    ~BMPImage(); 
 
-    /* Use a new image at path image_path, acts like the constructor*/
+    /* setup new image at path image_path, acts like the constructor
+        except when an error occures the member variables keep their previous values
+    */
     void updateImage(const std::string& image_path);
     void writeImage(const std::string& out_image_path);
 
-    std::string getImg();
-    void setImg(std::string img);
+    char* getImgData(); // return image_pixels
+    uint getImgSize(); // returns img_size
+    void setImgData(char* img); // sets image_pixels
 private:
-    std::string readImageFile(const std::string& image_path);
+    char* readImageFile(const std::string& image_path);
     
-    std::string prefix; // Image information
-    std::string image;  // Image pixels data
+    uint img_size; // image size in bytes
+    uint img_pixels_size; // pixels size in byte
+    char* image; // The whole image file content
+    char* image_pixels; // Image pixels data
 };
 
 
