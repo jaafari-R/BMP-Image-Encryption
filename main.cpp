@@ -58,7 +58,7 @@ char readArg1(char* arg)
     {
         if(strcmp(arg, "encrypt"))
             res = 'e';
-        if(strcmp(arg, "encrypt"))
+        if(strcmp(arg, "decrypt"))
             res = 'd';
     }
     return res;
