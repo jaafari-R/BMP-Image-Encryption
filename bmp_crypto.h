@@ -26,7 +26,7 @@ public:
     void writeImage(const std::string& out_image_path);
 
     char* getImgData(); // return image_pixels
-    uint getImgSize(); // returns img_size
+    uint getImgDataSize(); // returns img_pixels_size
     void setImgData(char* img); // sets image_pixels
 private:
     char* readImageFile(const std::string& image_path);

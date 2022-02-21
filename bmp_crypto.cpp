@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstring> // for memcpy
 
 /* -=-=-=-=-=-=-=-=- BMPImage -=-=-=-=-=-=-=-=- */
 
@@ -105,11 +106,10 @@ char* BMPImage::readImageFile(const std::string& image_path)
 }
 
 char* BMPImage::getImgData() {return image_pixels;}
-uint BMPImage::getImgSize() {return img_size;}
+uint BMPImage::getImgDataSize() {return img_pixels_size;}
 
 void BMPImage::setImgData(char* img)
 {
-    delete image;
-    image = img;
-    image_pixels = image + (img_size - img_pixels_size);
+    std::memcpy(image_pixels, img, img_pixels_size);
+    delete img;
 }
