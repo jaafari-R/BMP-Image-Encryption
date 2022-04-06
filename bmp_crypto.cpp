@@ -68,7 +68,7 @@ void BMPImage::updateImage(const std::string& image_path)
     {
         printf("An error occured while trying to open the BMP file.\n");
         iimg.close();
-        return nullptr;
+        return;
     }
 
     // get file length
@@ -95,7 +95,7 @@ void BMPImage::updateImage(const std::string& image_path)
     }   
 
     // read offset to image size(the position at which image pixels start)
-    iimg.seekg(0, iimg.beg + 10);
+    iimg.seekg(10);
     for(int i = 0; i < 4; ++i)
     {
         uint* c;
