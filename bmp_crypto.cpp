@@ -1,24 +1,29 @@
-#include "bmp_crypto.h"
+// #include "cryptopp/cryptlib.h"
+#include "cryptopp/modes.h"
+// #include "cryptopp/rijndael.h"
+// #include "cryptopp/files.h"
 
 #include <fstream>
 #include <iostream>
 #include <cstring> // for memcpy
 
+#include "bmp_crypto.h"
+
 /* -=-=-=-=-=-=-=-=- BMPImage -=-=-=-=-=-=-=-=- */
 
 BMPImage::BMPImage()
 {
+    prefix_size = 0;
     img_size = 0;
-    img_pixels_size = 0;
-    image = nullptr;
+    prefix = nullptr;
     image = nullptr;
 }
 
 BMPImage::BMPImage(const std::string& image_path)
 {
+    prefix_size = 0;
     img_size = 0;
-    img_pixels_size = 0;
-    image = nullptr;
+    prefix = nullptr;
     image = nullptr;
     updateImage(image_path);
 }
@@ -26,7 +31,10 @@ BMPImage::BMPImage(const std::string& image_path)
 BMPImage::~BMPImage()
 {
     if(img_size)
+    {
+        delete prefix;
         delete image;
+    }
 }
 
 void BMPImage::writeImage(const std::string& out_image_path)
@@ -40,7 +48,7 @@ void BMPImage::writeImage(const std::string& out_image_path)
         return;
     }
 
-    std::cout << img_size;
+    oimg.write(prefix, prefix_size);
     oimg.write(image, img_size);
     oimg.close();
 }
@@ -48,32 +56,11 @@ void BMPImage::writeImage(const std::string& out_image_path)
 void BMPImage::updateImage(const std::string& image_path)
 {
     uint pixels_offest = 0; // image pixels offset, end of image info
-    char* img = readImageFile(image_path);
-    if(!img)
-        return;
+    size_t file_length = 0; // size of prefix + pixels in bytes
+    size_t offset = 0;
+    int p256 = 1; // used to read an int, a byte at a time
 
-    // the position at which the image pixel data starts
-    pixels_offest = static_cast<uint>(img[10]) + static_cast<uint>(img[11]) * 256 + static_cast<uint>(img[12]) *256*256 + static_cast<uint>(img[13] *256*256*256);
-
-    // free memory if occupied
-    if(img_pixels_size)
-    {
-        delete image;
-        image = nullptr;
-        image_pixels = nullptr;
-        img_pixels_size = 0;
-    }
-
-    // set img data
-    image = img;
-    image_pixels = img + pixels_offest;
-    img_pixels_size = img_size - pixels_offest;
-}
-
-char* BMPImage::readImageFile(const std::string& image_path)
-{
-    char* img = nullptr;
-    int file_length;
+    // ---- read image file ---- //
     std::ifstream iimg(image_path);
 
     // check for error
@@ -83,35 +70,114 @@ char* BMPImage::readImageFile(const std::string& image_path)
         iimg.close();
         return nullptr;
     }
-    
-    // get length of file:
+
+    // get file length
     iimg.seekg (0, iimg.end);
     file_length = iimg.tellg();
     iimg.seekg (0, iimg.beg);
-    img = new char[file_length];
 
-    // read file
-    iimg.read(img, file_length);
-    iimg.close();
 
-    // check file type 
-    if(img[0] != 'B' || img[1] != 'M')
+    // ---- confirm file type and set prefix_size and image_size ---- //
+    // check file size, this is done to make sure no error occur when reading image_size or checking image type
+    if(file_length < 14)
+    {
+        printf("The file input is not a BMP file.\n");
+        iimg.close();
+        return;
+    }
+
+    // check file type
+    if(iimg.get() != 'B' || iimg.get() != 'M') // check first 2 letters in the file
     {
         std::cout << "The file: " << image_path << " is not a BMP image.\n";
-        delete img;
-        return nullptr;
+        iimg.close();
+        return;
+    }   
+
+    // read offset to image size(the position at which image pixels start)
+    iimg.seekg(0, iimg.beg + 10);
+    for(int i = 0; i < 4; ++i)
+    {
+        uint* c;
+        offset += static_cast<uint>(iimg.get()) * p256;
+        p256 *= 256;
     }
-    img_size = file_length;
-    return img;
+
+    // chekc if file is valid, based on offset read
+    if(file_length < offset)
+    {
+        printf("The file input is not a BMP file.\n");
+        iimg.close();
+        return;
+    }
+
+    // ---- read image and prefix ---- //
+    // reinitialize image
+    delete image;
+    delete prefix;
+    prefix = nullptr;
+    image = nullptr;
+    prefix_size = offset;
+    img_size = file_length - offset;
+
+    // read prefix and image
+    iimg.seekg (0, iimg.beg);
+    
+    prefix = new char[prefix_size];
+    iimg.read(prefix, prefix_size);
+
+    image = new char[img_size];
+    iimg.read(image, img_size);
 }
 
-char* BMPImage::getImgData() {return image_pixels;}
-uint BMPImage::getImgDataSize() {return img_pixels_size;}
+char* BMPImage::getImg() {return image;}
+uint BMPImage::getImgSize() {return img_size;}
 
-void BMPImage::setImgData(char* img)
+void BMPImage::setImg(char* img)
 {
     if(!img)
         return;
-    std::memcpy(image_pixels, img, img_pixels_size);
-    delete img;
+    std::cout << img << std::endl;
+    // std::memcpy(image_pixels, img, img_pixels_size);
+}
+
+/* -=-=-=-=-=-=-=-=- BMPCrypto -=-=-=-=-=-=-=-=- */
+
+BMPCrypto::BMPCrypto()
+{
+    key = CryptoPP::SecByteBlock(CryptoPP::AES::DEFAULT_KEYLENGTH);
+}
+
+BMPCrypto::BMPCrypto(std::string key)
+{
+    setKey(key);
+}
+
+void BMPCrypto::setKey(std::string k)
+{
+    uint8_t k_size = k.size();
+    uint8_t i;
+
+    if(k.size() < 17)
+        for(i = 0; i < 16; ++i)
+            key[i] = k[i];
+    else
+        for(i = 0; i < k.size(); ++i)
+            key[i] = k[i];
+}
+
+void BMPCrypto::encryptBMP(BMPImage& img)
+{
+    if(!img.getImgDataSize())
+        return;
+
+    // std::cout << img.getImgDataSize();
+    char* oimg = new char[img.getImgDataSize()];
+    // CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
+
+    // CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption enc(key, key.size(), iv);
+    // enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImgData()), img.getImgDataSize());
+    
+    img.setImgData(oimg);
+    delete oimg;
 }
