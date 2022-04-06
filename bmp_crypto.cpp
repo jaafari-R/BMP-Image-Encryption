@@ -168,16 +168,16 @@ void BMPCrypto::setKey(std::string k)
 
 void BMPCrypto::encryptBMP(BMPImage& img)
 {
-    if(!img.getImgDataSize())
+    if(!img.getImgSize())
         return;
 
     // std::cout << img.getImgDataSize();
-    char* oimg = new char[img.getImgDataSize()];
+    char* oimg = new char[img.getImgSize()];
     // CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
 
     // CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption enc(key, key.size(), iv);
     // enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImgData()), img.getImgDataSize());
     
-    img.setImgData(oimg);
+    img.setImg(oimg);
     delete oimg;
 }

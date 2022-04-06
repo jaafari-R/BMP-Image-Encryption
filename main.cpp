@@ -31,9 +31,10 @@ int main(int argc, char* argv[])
     // -+-+-+-+- Input reading -+-+-+-+-
     if(argc < 4)
     {
-        printf("Two arguements are required,\n\t"
-        "arg1: e/encrypt or d/decrypt"
-        "arg2: the path to the bmp image.\n");
+        printf("Three arguements are required,\n\t"
+        "arg1: e/encrypt or d/decrypt\n"
+        "arg2: the path to the input bmp image.\n"
+        "arg3: the path to the output bmp image.\n");
         return 1;
     }
 
@@ -45,11 +46,11 @@ int main(int argc, char* argv[])
     }
 
     // test
-    BMPImage img(argv[2]);
-    BMPCrypto c;
+    // BMPImage img(argv[2]);
+    // BMPCrypto c;
 
-    c.encryptBMP(img);
-    img.writeImage(argv[3]);
+    // c.encryptBMP(img);
+    // img.writeImage(argv[3]);
 }
 
 char readArg1(char* arg)
