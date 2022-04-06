@@ -31,7 +31,9 @@ public:
     */
     void updateImage(const std::string& image_path);
 
-    /* */
+    /* write bmp image to a file
+        if an error occurs while writing the file, an error message will be displayed
+    */
     void writeImage(const std::string& out_image_path);
 
     char* getImg(); // return image_pixels

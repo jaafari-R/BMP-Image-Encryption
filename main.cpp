@@ -46,11 +46,11 @@ int main(int argc, char* argv[])
     }
 
     // test
-    // BMPImage img(argv[2]);
-    // BMPCrypto c;
+    BMPImage img(argv[2]);
+    BMPCrypto c;
 
-    // c.encryptBMP(img);
-    // img.writeImage(argv[3]);
+    c.encryptBMP(img);
+    img.writeImage(argv[3]);
 }
 
 char readArg1(char* arg)

@@ -138,7 +138,7 @@ void BMPImage::setImg(char* img)
     if(!img)
         return;
     std::cout << img << std::endl;
-    // std::memcpy(image_pixels, img, img_pixels_size);
+    std::memcpy(image, img, img_size);
 }
 
 /* -=-=-=-=-=-=-=-=- BMPCrypto -=-=-=-=-=-=-=-=- */
@@ -158,12 +158,15 @@ void BMPCrypto::setKey(std::string k)
     uint8_t k_size = k.size();
     uint8_t i;
 
-    if(k.size() < 17)
+    if(k.size() >= 16)
         for(i = 0; i < 16; ++i)
             key[i] = k[i];
     else
+    {
+        key = CryptoPP::SecByteBlock(CryptoPP::AES::DEFAULT_KEYLENGTH);
         for(i = 0; i < k.size(); ++i)
             key[i] = k[i];
+    }
 }
 
 void BMPCrypto::encryptBMP(BMPImage& img)
@@ -173,10 +176,10 @@ void BMPCrypto::encryptBMP(BMPImage& img)
 
     // std::cout << img.getImgDataSize();
     char* oimg = new char[img.getImgSize()];
-    // CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
+    CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
 
-    // CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption enc(key, key.size(), iv);
-    // enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImgData()), img.getImgDataSize());
+    CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption enc(key, key.size(), iv);
+    enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImg()), img.getImgSize());
     
     img.setImg(oimg);
     delete oimg;
