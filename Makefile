@@ -3,3 +3,6 @@ compile:
 
 encryption_test:
 	./a.out e test.bmp outtest.bmp
+
+decryption_test:
+	./a.out d outtest.bmp decouttest.bmp 

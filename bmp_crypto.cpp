@@ -137,7 +137,6 @@ void BMPImage::setImg(char* img)
 {
     if(!img)
         return;
-    std::cout << img << std::endl;
     std::memcpy(image, img, img_size);
 }
 
@@ -146,25 +145,28 @@ void BMPImage::setImg(char* img)
 BMPCrypto::BMPCrypto()
 {
     key = CryptoPP::SecByteBlock(CryptoPP::AES::DEFAULT_KEYLENGTH);
+    for(size_t i = 0; i < 16; ++i)
+        key[i] = 0;
 }
 
-BMPCrypto::BMPCrypto(std::string key)
+BMPCrypto::BMPCrypto(std::string k)
 {
-    setKey(key);
+    key = CryptoPP::SecByteBlock(CryptoPP::AES::DEFAULT_KEYLENGTH);
+    setKey(k);
 }
 
 void BMPCrypto::setKey(std::string k)
 {
-    uint8_t k_size = k.size();
+    uint8_t key_size = k.size();
     uint8_t i;
 
-    if(k.size() >= 16)
+    if(key_size >= 15)
         for(i = 0; i < 16; ++i)
             key[i] = k[i];
     else
     {
         key = CryptoPP::SecByteBlock(CryptoPP::AES::DEFAULT_KEYLENGTH);
-        for(i = 0; i < k.size(); ++i)
+        for(i = 0; i < key_size; ++i)
             key[i] = k[i];
     }
 }
@@ -174,13 +176,28 @@ void BMPCrypto::encryptBMP(BMPImage& img)
     if(!img.getImgSize())
         return;
 
-    // std::cout << img.getImgDataSize();
     char* oimg = new char[img.getImgSize()];
     CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
 
     CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption enc(key, key.size(), iv);
-    enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImg()), img.getImgSize());
+    enc.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImg()), img.getImgSize());// set up encryption parameters
     
+    img.setImg(oimg);
+    delete oimg;
+}
+
+void BMPCrypto::decrpytBMP(BMPImage& img)
+{
+    if(!img.getImgSize())
+        return;
+
+    char* oimg = new char[img.getImgSize()];
+
+    CryptoPP::SecByteBlock iv(CryptoPP::AES::BLOCKSIZE); // iv is 0 by default
+    CryptoPP::CBC_Mode<CryptoPP::AES>::Decryption dec(key, key.size(), iv); // set up decryption parameters
+    // decrypt image
+    dec.ProcessData(reinterpret_cast<byte*>(oimg), reinterpret_cast<byte*>(img.getImg()), img.getImgSize());
+
     img.setImg(oimg);
     delete oimg;
 }

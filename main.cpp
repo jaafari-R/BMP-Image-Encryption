@@ -45,11 +45,16 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // test
+    // input 
+
+    // read and encrypt/decrypt image
     BMPImage img(argv[2]);
     BMPCrypto c;
 
-    c.encryptBMP(img);
+    if(option == 'e')
+        c.encryptBMP(img);
+    else if(option == 'd')
+        c.decrpytBMP(img);
     img.writeImage(argv[3]);
 }
 
