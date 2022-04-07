@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     }
 
     // input 
-    std::cout << "Please insert a key: "; 
+    printf("Please insert a key: "); 
     std::getline(std::cin, key);
 
     // read and encrypt/decrypt image
