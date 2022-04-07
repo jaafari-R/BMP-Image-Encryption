@@ -1,6 +1,6 @@
 /*
-    This Program uses AES in CBC mode to encrypt
-     an image in bmp format.
+    This Program uses AES in CBC mode with iv set to 
+     0 to encrypt an image in bmp format.
     The main function takes 2 arguments:
         arg1: e/encrypt for encryption.
               d/decrypt for decryption.
