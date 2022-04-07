@@ -27,6 +27,7 @@ int main(int argc, char* argv[])
     char option; // 'e' = encrypt / 'd' = decrypt / 0 = invalid option
     std::string in_img_path; // the path of the input img
     std::string out_img_path; // the path of the output img
+    std::string key;
 
     // -+-+-+-+- Input reading -+-+-+-+-
     if(argc < 4)
@@ -46,10 +47,12 @@ int main(int argc, char* argv[])
     }
 
     // input 
+    std::cout << "Please insert a key: "; 
+    std::getline(std::cin, key);
 
     // read and encrypt/decrypt image
     BMPImage img(argv[2]);
-    BMPCrypto c;
+    BMPCrypto c(key);
 
     if(option == 'e')
         c.encryptBMP(img);
