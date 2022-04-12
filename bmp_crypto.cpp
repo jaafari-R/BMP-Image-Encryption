@@ -98,7 +98,6 @@ void BMPImage::updateImage(const std::string& image_path)
     iimg.seekg(10);
     for(int i = 0; i < 4; ++i)
     {
-        uint* c;
         offset += static_cast<uint>(iimg.get()) * p256;
         p256 *= 256;
     }
