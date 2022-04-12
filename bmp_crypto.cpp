@@ -127,6 +127,8 @@ void BMPImage::updateImage(const std::string& image_path)
 
     image = new char[img_size];
     iimg.read(image, img_size);
+
+    iimg.close();
 }
 
 char* BMPImage::getImg() {return image;}

@@ -40,6 +40,7 @@ public:
     uint getImgSize(); // returns img_pixels_size
     /* sets image_pixels, this function does nothing if img is a nullptr,
         and frees img memory, if img is not an allocated memory on the heap an error will occure
+        img Should be the same size as this->image
     */
     void setImg(char* img);
 private:
